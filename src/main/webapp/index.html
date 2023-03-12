@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script>
+            
+            var ws = null;
+            
+            /*
+            function restaurar(){
+                document.getElementById("txtNombre").innerHTML="";
+                document.getElementById("txtDescripcion").innerHTML="";
+                document.getElementById("txtEnviar").innerHTML="";
+            }
+            */
+            
+            function click(){
+                var textInputNombre = document.getElementById("txtNombre");
+                var textDescripcion = document.getElementById("txtDescripcion");
+                var textEnviar = document.getElementById("txtEnviar");
+                var mensajes = document.getElementById("txtArea");
+
+                mensajes.value = "yo: "+ textInputNombre.value;
+                
+                var obj = new Object();
+                obj.nombre = textInputNombre.value;
+                obj.descripcion = textDescripcion.value;
+                
+                var jsonString = JSON.stringify(obj);
+                
+                if(textEnviar.value != ""){
+                    jsonString += "&"+textEnviar.value;
+                }
+   
+                ws.send(jsonString.toString());
+                
+                
+                
+            }
+            
+            window.onload= function(){
+                var txtArea = document.getElementById("txtArea");
+                var btnEnviar = document.getElementById("btn");
+                /*
+                var btnRestaurar = documnt.getElementById("btnRest");
+                btnRestaurar.onclick = restaurar;
+                */
+               
+                btnEnviar.onclick = click;
+                
+                
+                ws= new WebSocket("ws://localhost:8080/AplicacionWebSocket/websocketend");
+                
+                ws.onopen= function () {
+                    ws.send("conectado")
+                }
+                
+                ws.onmessage = function (evt) {
+                    var msg = evt.data;
+                    var mensajes = document.getElementById("txtArea");
+                    mensajes.value += "\n" + msg;
+                }
+
+            }
+        </script>
+    </head>
+    <body>
+        <label>Nombre del producto: </label>
+        <input type="text" id="txtNombre">
+         
+        <br><!-- comment -->
+         
+        <label>Descripcion del producto: </label>
+        <input type="text" id="txtDescripcion">
+        
+        <br>
+        
+        <label>Enviar a: </label>
+        <input type="text" id="txtEnviar" placeholder="id de usuario"
+               minlength="50">
+        <label>(dejar vacio para enviar a todos)</label>
+        
+        <br>
+        
+        <input type="button" value="enviar" id="btn">
+        <input type="button" value="restaurar" id="btnRest">
+        <br>
+        
+        <textarea id="txtArea"  ></textarea>
+    </body>
+</html>
